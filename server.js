@@ -1,43 +1,32 @@
 // Dependencies
-
 var express = require('express');
 var bodyParser = require('body-parser');
-var logger = require('morgan');
+var bluebird = require("bluebird");
 var mongoose = require('mongoose');
+var routes = require("./routes/routes");
 
-// Require mongoose schema
-var Article = require('./models/article');
+var Port = process.env.PORT || 3000;
+mongoose.Promise = bluebird;
 
-// Create Instance of Express
 var app = express();
-var PORT = process.env.PORT || 3000;
 
-app.use(logger('dev'));
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.text());
-app.use(bodyParser.json({type:'application/vnd.api+json'}));
+app.use(bodyParser.json());
 
-app.use(express.static('./public'));
+app.use(express.static(__dirname + '/public'));
+app.use("/", routes);
 
 // MongoDB configuration
-mongoose.connect();
-var db = mongoose.connection;
 
-db.on('error', function(err) {
-	console.log('Mongoose Error: ', err);
-});
-
-db.once('open', function() {
-	console.log("Mongoose connection successful.");
-});
-
-// Main route.  This route will redirect to rendered React app
-app.get('/', function(req, res) {
-	res.sendFile('./public/index.html');
+mongoose.connect(db, function(error){
+	if(error){
+		console.log("mongoose error: " + error);
+	}else{
+		console.log("mongoose connection is succesful!");
+	}
 });
 
 // Listener 
 app.listen(PORT, function() {
-	console.log("App listening on PORT: " + PORT);
+	console.log("App listening on port %s! ", PORT);
 });
