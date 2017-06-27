@@ -5,7 +5,7 @@ var bluebird = require("bluebird");
 var mongoose = require('mongoose');
 var routes = require("./routes/routes");
 
-var Port = process.env.PORT || 3000;
+var PORT = process.env.PORT || 3000;
 mongoose.Promise = bluebird;
 
 var app = express();
@@ -17,6 +17,7 @@ app.use(express.static(__dirname + '/public'));
 app.use("/", routes);
 
 // MongoDB configuration
+var db = process.env.MONGODB_URI || "mongodb://localhost/nytreact";
 
 mongoose.connect(db, function(error){
 	if(error){
